@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  flask:
+    build: .
+    container_name: flask
+    restart: unless-stopped
+    command: bash -c 'flask mariabp init-db && flask sqlitebp init-db && gunicorn --bind 0.0.0.0:80 wsgi:app'
+    ports:
+      - "5000:80"
+    depends_on:
+      - maria_db
+    environment:
+      - MARIABD_USER=root
+      - MARIABD_PASSWD=MYPASSWORD
+      - MARIABD_ADDR=maria_db
+      - MARIABD_PORT=3306
+      - MARIABD_DBNAME=db
+
+  maria_db:
+    image: mariadb:latest
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=MYPASSWORD
+      - MYSQL_DATABASE=db
+      - MARIADB_USER=root
